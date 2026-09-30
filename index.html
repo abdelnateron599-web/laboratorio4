@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRTIC — Laboratorio 04 / Abdel</title>
+<meta name="description" content="Laboratorio 4: Gerencia de Recursos de Tecnología de Información y Comunicación.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F1F0E8;
+  --ink:#0A0C0C;
+  --acid:#C8FF54;
+  --cyan:#7CE8FF;
+  --soft:#DAD9CF;
+  --muted:#636863;
+  --red:#FF684F;
+  --white:#FBFBF6;
+  --line:#191C1C;
+  --max:1440px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Syne",system-ui,sans-serif;
+  overflow-x:hidden;
+}
+::selection{background:var(--acid);color:var(--ink)}
+a{color:inherit}
+button{font:inherit}
+.mono{font-family:"DM Mono",monospace}
+.container{width:min(var(--max),calc(100% - 44px));margin:auto}
+.rule{height:1px;background:var(--line);opacity:.85}
+.noise{
+  pointer-events:none;position:fixed;inset:0;z-index:99;opacity:.045;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+}
+.topbar{
+  position:sticky;top:0;z-index:80;background:rgba(241,240,232,.92);
+  backdrop-filter:blur(16px);border-bottom:1px solid var(--line)
+}
+.topbar .inner{
+  height:54px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px
+}
+.brand{font-weight:800;letter-spacing:-.04em;text-decoration:none}
+.status{display:flex;align-items:center;gap:9px;font:500 11px/1 "DM Mono",monospace;letter-spacing:.08em;text-transform:uppercase}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--acid);box-shadow:0 0 0 0 rgba(200,255,84,.7);animation:pulse 1.9s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 9px rgba(200,255,84,0)}100%{box-shadow:0 0 0 0 rgba(200,255,84,0)}}
+.nav{justify-self:end;display:flex;gap:18px}
+.nav a{text-decoration:none;font:500 11px/1 "DM Mono",monospace;text-transform:uppercase;letter-spacing:.06em}
+.nav a:hover{background:var(--acid)}
+
+.hero{min-height:calc(100vh - 54px);display:grid;align-items:stretch;border-bottom:1px solid var(--line)}
+.hero-grid{display:grid;grid-template-columns:1.55fr .72fr}
+.hero-main{padding:58px 38px 44px 0;border-right:1px solid var(--line);position:relative}
+.kicker{font:500 12px/1.3 "DM Mono",monospace;text-transform:uppercase;letter-spacing:.12em;display:flex;gap:14px;align-items:center}
+.kicker::before{content:"";width:36px;height:10px;background:var(--acid);border:1px solid var(--line)}
+.hero h1{
+  font-size:clamp(5.1rem,11.2vw,11.8rem);
+  line-height:.78;letter-spacing:-.078em;margin:58px 0 42px;font-weight:800;text-transform:uppercase;
+}
+.hero h1 .outline{
+  color:transparent;-webkit-text-stroke:1.4px var(--ink);
+}
+.hero-lower{display:grid;grid-template-columns:.8fr 1.2fr;gap:46px;align-items:end}
+.hero-code{font:400 11px/1.65 "DM Mono",monospace;text-transform:uppercase;color:var(--muted)}
+.hero-intro{font-size:clamp(1.15rem,2vw,1.72rem);line-height:1.25;letter-spacing:-.035em;max-width:700px}
+.hero-side{position:relative;background:var(--ink);color:var(--paper);min-height:100%;overflow:hidden}
+.scan{
+  position:absolute;inset:0;
+  background:
+   linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),
+   linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:34px 34px;
+}
+.hero-side-content{position:relative;z-index:2;height:100%;padding:28px;display:flex;flex-direction:column;justify-content:space-between}
+.side-label{font:500 11px/1.3 "DM Mono",monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--acid)}
+.system{
+  border:1px solid rgba(255,255,255,.22);padding:20px;background:rgba(255,255,255,.035)
+}
+.system svg{width:100%;height:auto;display:block}
+.sys-legend{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+.sys-item{border-top:1px solid rgba(255,255,255,.28);padding-top:9px}
+.sys-item b{display:block;font:500 10px/1 "DM Mono",monospace;color:var(--cyan);margin-bottom:7px}
+.sys-item span{font-size:.82rem;color:#d8d8d0}
+.index-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(255,255,255,.2)
+}
+.index-strip div{padding:18px 12px;border-right:1px solid rgba(255,255,255,.2)}
+.index-strip div:last-child{border-right:0}
+.index-strip strong{font-size:1.45rem;color:var(--acid)}
+.index-strip small{display:block;font:400 9px/1.25 "DM Mono",monospace;margin-top:5px;color:#aaa}
+
+.section{border-bottom:1px solid var(--line)}
+.section-grid{display:grid;grid-template-columns:180px 1fr}
+.section-rail{border-right:1px solid var(--line);padding:34px 28px 34px 0;position:relative}
+.section-rail .num{font:500 12px/1 "DM Mono",monospace}
+.section-rail .vertical{
+  position:sticky;top:85px;margin-top:34px;writing-mode:vertical-rl;transform:rotate(180deg);
+  text-transform:uppercase;font-size:.78rem;letter-spacing:.16em;font-weight:700;color:var(--muted)
+}
+.section-body{padding:78px 0 82px 48px}
+.section-head{display:grid;grid-template-columns:1.15fr .85fr;gap:64px;margin-bottom:62px}
+.section-head h2{
+  font-size:clamp(3.2rem,6.6vw,7.1rem);line-height:.86;letter-spacing:-.068em;margin:0;text-transform:uppercase
+}
+.section-head p{font-size:1.05rem;line-height:1.6;margin:0;color:var(--muted);align-self:end;max-width:620px}
+.highlight{background:var(--acid);padding:0 .08em}
+
+.definition{
+  display:grid;grid-template-columns:.62fr 1.38fr;border:1px solid var(--line);min-height:360px
+}
+.definition .stamp{
+  background:var(--acid);padding:28px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--line)
+}
+.stamp-big{font-size:clamp(5rem,10vw,10rem);line-height:.75;letter-spacing:-.08em;font-weight:800}
+.stamp-small{font:500 11px/1.5 "DM Mono",monospace;text-transform:uppercase}
+.definition .copy{padding:42px;display:grid;grid-template-columns:1fr 1fr;gap:38px;align-content:center}
+.definition .copy p{font-size:1.05rem;line-height:1.65;margin:0;color:#343838}
+.quote{font-size:1.8rem!important;line-height:1.2!important;letter-spacing:-.04em;color:var(--ink)!important;font-weight:600}
+
+.phases{border:1px solid var(--line)}
+.phase{
+  display:grid;grid-template-columns:110px 1fr .72fr;min-height:210px;border-bottom:1px solid var(--line);
+  transition:background .25s ease
+}
+.phase:last-child{border-bottom:0}
+.phase:hover{background:var(--white)}
+.phase-no{
+  border-right:1px solid var(--line);display:grid;place-items:center;font-size:3.5rem;font-weight:800;letter-spacing:-.07em
+}
+.phase-main{padding:30px 34px;border-right:1px solid var(--line)}
+.phase-main h3{font-size:clamp(1.8rem,3vw,3.2rem);margin:0 0 13px;letter-spacing:-.05em}
+.phase-main p{margin:0;color:var(--muted);max-width:720px;line-height:1.65}
+.phase-q{padding:30px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;background:rgba(0,0,0,.015)}
+.phase-q span:first-child{font:500 10px/1.5 "DM Mono",monospace;text-transform:uppercase;color:var(--muted)}
+.phase-q strong{font-size:1.15rem;max-width:190px;text-align:right}
+.phase:nth-child(2) .phase-no{background:var(--cyan)}
+.phase:nth-child(4) .phase-no{background:var(--acid)}
+
+.architecture{display:grid;grid-template-columns:.95fr 1.05fr;border:1px solid var(--line)}
+.arch-visual{background:var(--ink);padding:34px;color:var(--paper);min-height:640px;position:relative;overflow:hidden}
+.arch-visual::after{
+  content:"";position:absolute;right:-110px;bottom:-110px;width:340px;height:340px;border:1px solid rgba(200,255,84,.6);border-radius:50%;
+  box-shadow:0 0 0 54px rgba(200,255,84,.05),0 0 0 108px rgba(200,255,84,.03)
+}
+.arch-title{font-size:clamp(3rem,5vw,5.7rem);line-height:.9;letter-spacing:-.06em;text-transform:uppercase;margin:20px 0 24px;max-width:550px}
+.arch-copy{color:#c8cac3;max-width:510px;line-height:1.65}
+.layers{position:absolute;left:34px;right:34px;bottom:34px;z-index:2}
+.layer{display:flex;justify-content:space-between;gap:20px;padding:15px 0;border-top:1px solid rgba(255,255,255,.28)}
+.layer:last-child{border-bottom:1px solid rgba(255,255,255,.28)}
+.layer span:first-child{font-weight:700}
+.layer span:last-child{font:500 10px/1 "DM Mono",monospace;color:var(--acid);text-transform:uppercase}
+.topic-grid{display:grid;grid-template-columns:1fr 1fr}
+.topic{
+  min-height:255px;padding:28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);position:relative
+}
+.topic:nth-child(even){border-right:0}
+.topic:nth-last-child(-n+2){border-bottom:0}
+.topic .topic-no{font:500 10px/1 "DM Mono",monospace;color:var(--muted)}
+.topic h3{font-size:1.55rem;letter-spacing:-.045em;margin:28px 0 12px;max-width:280px}
+.topic p{font-size:.92rem;line-height:1.58;color:var(--muted);margin:0}
+.topic:hover{background:var(--acid)}
+.topic:hover p,.topic:hover .topic-no{color:var(--ink)}
+
+.security-board{display:grid;grid-template-columns:1.1fr .9fr;border:1px solid var(--line)}
+.cyber{background:var(--ink);color:var(--paper);padding:40px;min-height:590px}
+.cyber-head{display:flex;justify-content:space-between;gap:24px}
+.cyber-head h3{font-size:clamp(2.7rem,5vw,5.4rem);line-height:.9;letter-spacing:-.06em;margin:0;text-transform:uppercase}
+.cyber-head .badge{font:500 9px/1.4 "DM Mono",monospace;text-transform:uppercase;border:1px solid rgba(255,255,255,.34);padding:10px;height:max-content;color:var(--cyan)}
+.cyber-flow{margin-top:64px}
+.cyber-row{display:grid;grid-template-columns:26px 130px 1fr;gap:18px;padding:16px 0;border-top:1px solid rgba(255,255,255,.22);align-items:center}
+.cyber-row:last-child{border-bottom:1px solid rgba(255,255,255,.22)}
+.cyber-row i{width:9px;height:9px;border-radius:50%;background:var(--acid)}
+.cyber-row strong{font:500 11px/1 "DM Mono",monospace;text-transform:uppercase;color:var(--acid)}
+.cyber-row span{color:#c9cbc4;font-size:.9rem}
+.training{padding:40px;display:flex;flex-direction:column;justify-content:space-between}
+.training .mega{font-size:clamp(6rem,12vw,12rem);line-height:.72;font-weight:800;letter-spacing:-.1em}
+.training h3{font-size:2.2rem;letter-spacing:-.05em;margin:28px 0 14px}
+.training p{color:var(--muted);line-height:1.65}
+.checks{margin-top:32px}
+.check{display:grid;grid-template-columns:24px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:.88rem}
+.check:last-child{border-bottom:1px solid var(--line)}
+.check b{font-family:"DM Mono",monospace}
+
+.ethics{background:var(--acid);border:1px solid var(--line);display:grid;grid-template-columns:.82fr 1.18fr}
+.ethics-left{padding:38px;border-right:1px solid var(--line)}
+.ethics-left h3{font-size:clamp(3rem,6vw,6.3rem);line-height:.86;letter-spacing:-.07em;text-transform:uppercase;margin:24px 0 30px}
+.ethics-left p{max-width:520px;line-height:1.65}
+.principles{display:grid;grid-template-columns:1fr 1fr}
+.principle{min-height:170px;padding:28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between}
+.principle:nth-child(even){border-right:0}
+.principle:nth-last-child(-n+2){border-bottom:0}
+.principle small{font:500 9px/1 "DM Mono",monospace;text-transform:uppercase}
+.principle strong{font-size:1.18rem;max-width:220px;letter-spacing:-.03em}
+
+.conclusion{
+  background:var(--ink);color:var(--paper);padding:90px 0;border-bottom:1px solid var(--line)
+}
+.conclusion-grid{display:grid;grid-template-columns:.5fr 1.5fr;gap:80px}
+.conclusion .left{font:500 11px/1.5 "DM Mono",monospace;text-transform:uppercase;color:var(--cyan)}
+.conclusion h2{font-size:clamp(3rem,6.5vw,7rem);line-height:.9;letter-spacing:-.065em;margin:0 0 32px;text-transform:uppercase}
+.conclusion p{font-size:1.1rem;line-height:1.7;color:#c8cac3;max-width:850px}
+
+.references{padding:78px 0}
+.references h2{font-size:clamp(3rem,6vw,6.4rem);line-height:.9;letter-spacing:-.06em;text-transform:uppercase;margin:0 0 46px}
+.ref-list{border-top:1px solid var(--line)}
+.ref{
+  display:grid;grid-template-columns:72px 1.4fr .8fr 40px;gap:22px;align-items:center;
+  padding:20px 0;border-bottom:1px solid var(--line);text-decoration:none;transition:padding .2s ease,background .2s ease
+}
+.ref:hover{background:var(--acid);padding-left:14px;padding-right:14px}
+.ref .rno{font:500 11px/1 "DM Mono",monospace}
+.ref strong{font-size:1rem}
+.ref span{font:400 11px/1.4 "DM Mono",monospace;color:var(--muted)}
+.ref .go{font-size:1.3rem;text-align:right;color:var(--ink)}
+.footer{
+  background:var(--cyan);border-top:1px solid var(--line);padding:26px 0
+}
+.footer-inner{display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}
+.footer strong{font-size:1.12rem}
+.footer small{display:block;font:400 10px/1.5 "DM Mono",monospace;text-transform:uppercase;margin-top:4px}
+.footer-code{font:500 11px/1 "DM Mono",monospace;text-transform:uppercase}
+
+.progress{position:fixed;left:0;top:54px;height:3px;background:var(--red);z-index:90;width:0}
+.fade{opacity:0;transform:translateY(22px);transition:opacity .75s cubic-bezier(.2,.8,.2,1),transform .75s cubic-bezier(.2,.8,.2,1)}
+.fade.in{opacity:1;transform:none}
+
+@media(max-width:1050px){
+  .hero-grid,.section-head,.definition,.architecture,.security-board,.ethics,.conclusion-grid{grid-template-columns:1fr}
+  .hero-main{border-right:0;padding-right:0}
+  .hero-side{min-height:520px}
+  .hero-lower{grid-template-columns:1fr}
+  .section-grid{grid-template-columns:74px 1fr}
+  .section-rail{padding-right:14px}
+  .section-body{padding-left:28px}
+  .definition .stamp,.ethics-left{border-right:0;border-bottom:1px solid var(--line)}
+  .topic-grid,.principles{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .container{width:min(var(--max),calc(100% - 24px))}
+  .topbar .inner{grid-template-columns:1fr auto}.status{display:none}.nav{gap:9px}.nav a:nth-child(-n+2){display:none}
+  .hero h1{font-size:clamp(4.2rem,20vw,7rem);margin:42px 0 32px}
+  .hero-lower{gap:20px}
+  .hero-side{min-height:460px}
+  .section-grid{grid-template-columns:1fr}
+  .section-rail{display:none}
+  .section-body{padding:58px 0}
+  .section-head{gap:26px;margin-bottom:42px}
+  .section-head h2{font-size:clamp(3.1rem,17vw,5.5rem)}
+  .definition .copy{grid-template-columns:1fr;padding:26px}
+  .phase{grid-template-columns:76px 1fr}.phase-q{grid-column:1 / -1;border-top:1px solid var(--line)}
+  .phase-main{border-right:0;padding:24px}
+  .phase-no{font-size:2.5rem}
+  .topic-grid,.principles{grid-template-columns:1fr}
+  .topic,.principle{border-right:0!important;border-bottom:1px solid var(--line)!important}
+  .topic:last-child,.principle:last-child{border-bottom:0!important}
+  .arch-visual{min-height:610px}
+  .cyber-head{display:block}.cyber-head .badge{display:inline-block;margin-top:18px}
+  .cyber-row{grid-template-columns:20px 100px 1fr;gap:10px}
+  .ref{grid-template-columns:44px 1fr 32px}.ref span{display:none}
+  .footer-inner{grid-template-columns:1fr}.footer-code{justify-self:start}
+}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="progress" id="progress"></div>
+
+<header class="topbar">
+  <div class="container inner">
+    <a class="brand" href="#inicio">GRTIC—04</a>
+    <div class="status"><span class="pulse"></span> Sistema académico / en línea</div>
+    <nav class="nav">
+      <a href="#ciclo">Ciclo</a>
+      <a href="#infra">Infraestructura</a>
+      <a href="#etica">Ética</a>
+      <a href="#fuentes">Fuentes</a>
+    </nav>
+  </div>
+</header>
+
+<main id="inicio">
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-main">
+        <div class="kicker">Gerencia de Recursos de Tecnología de Información y Comunicación</div>
+        <h1>DIRIGIR<br><span class="outline">TECNOLOGÍA</span></h1>
+        <div class="hero-lower">
+          <div class="hero-code">
+            LAB / 04<br>
+            AUTOR / ABDEL<br>
+            CURSO / GRTIC<br>
+            EDICIÓN / 2026
+          </div>
+          <div class="hero-intro">
+            La tecnología no se administra solo con equipos. Se dirige mediante decisiones:
+            <strong>qué se necesita, cómo se diseña, cómo se implementa y cómo se evalúa.</strong>
+          </div>
+        </div>
+      </div>
+
+      <aside class="hero-side">
+        <div class="scan"></div>
+        <div class="hero-side-content">
+          <div class="side-label">Mapa del sistema / TIC</div>
+          <div class="system">
+            <svg viewBox="0 0 520 330" fill="none" aria-label="Diagrama de red">
+              <g stroke="#7CE8FF" stroke-width="1.5" opacity=".55">
+                <path d="M70 82L188 55L280 118L414 71"/>
+                <path d="M70 82L131 203L280 118L355 235L453 176"/>
+                <path d="M131 203L226 273L355 235"/>
+                <path d="M188 55L226 273"/>
+                <path d="M414 71L453 176"/>
+              </g>
+              <g fill="#0A0C0C" stroke="#C8FF54" stroke-width="3">
+                <circle cx="70" cy="82" r="12"/><circle cx="188" cy="55" r="12"/>
+                <circle cx="280" cy="118" r="12"/><circle cx="414" cy="71" r="12"/>
+                <circle cx="131" cy="203" r="12"/><circle cx="226" cy="273" r="12"/>
+                <circle cx="355" cy="235" r="12"/><circle cx="453" cy="176" r="12"/>
+              </g>
+              <g font-family="DM Mono, monospace" font-size="11" fill="#F1F0E8">
+                <text x="49" y="112">HW</text><text x="169" y="34">SW</text>
+                <text x="259" y="151">DATA</text><text x="391" y="49">NET</text>
+                <text x="95" y="236">USER</text><text x="200" y="305">OPS</text>
+                <text x="332" y="268">SEC</text><text x="431" y="209">CLOUD</text>
+              </g>
+            </svg>
+            <div class="sys-legend">
+              <div class="sys-item"><b>01 / RECURSOS</b><span>Hardware + software</span></div>
+              <div class="sys-item"><b>02 / CONTROL</b><span>Monitoreo + seguridad</span></div>
+              <div class="sys-item"><b>03 / PERSONAS</b><span>Capacitación</span></div>
+              <div class="sys-item"><b>04 / CRITERIO</b><span>Ética + integración</span></div>
+            </div>
+          </div>
+          <div class="index-strip">
+            <div><strong>01</strong><small>PLAN</small></div>
+            <div><strong>02</strong><small>DISEÑO</small></div>
+            <div><strong>03</strong><small>IMPLEMENTA</small></div>
+            <div><strong>04</strong><small>EVALÚA</small></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" id="concepto">
+    <div class="container section-grid">
+      <aside class="section-rail">
+        <div class="num">01 / 06</div>
+        <div class="vertical">Concepto central</div>
+      </aside>
+      <div class="section-body">
+        <div class="section-head fade">
+          <h2>GERENCIA<br>TECNOLÓGICA</h2>
+          <p>
+            Es la administración organizada de los recursos TIC para que respondan a las necesidades
+            reales de la empresa. Involucra infraestructura, información, procesos, personas y decisiones.
+          </p>
+        </div>
+
+        <div class="definition fade">
+          <div class="stamp">
+            <div class="stamp-small">Principio / 001<br>Dirección estratégica</div>
+            <div class="stamp-big">TIC</div>
+          </div>
+          <div class="copy">
+            <p class="quote">No se trata de “tener tecnología”. Se trata de <span class="highlight">hacer que funcione para la organización.</span></p>
+            <p>
+              Una gerencia tecnológica efectiva conecta los objetivos empresariales con los recursos
+              digitales disponibles. Esto permite priorizar inversiones, reducir riesgos, mantener la
+              continuidad de las operaciones y adaptar la infraestructura cuando cambian las necesidades.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="ciclo">
+    <div class="container section-grid">
+      <aside class="section-rail">
+        <div class="num">02 / 06</div>
+        <div class="vertical">Ciclo de gestión</div>
+      </aside>
+      <div class="section-body">
+        <div class="section-head fade">
+          <h2>CUATRO<br>FASES</h2>
+          <p>
+            La infraestructura TIC se gestiona como un ciclo. Cada fase responde una pregunta distinta
+            y todas se conectan entre sí: planificar, diseñar, implementar y evaluar.
+          </p>
+        </div>
+
+        <div class="phases fade">
+          <article class="phase">
+            <div class="phase-no">01</div>
+            <div class="phase-main">
+              <h3>Planificación</h3>
+              <p>Define necesidades, objetivos, presupuesto, prioridades, riesgos y recursos antes de tomar decisiones tecnológicas.</p>
+            </div>
+            <div class="phase-q"><span>Pregunta guía</span><strong>¿Qué necesita la organización?</strong></div>
+          </article>
+          <article class="phase">
+            <div class="phase-no">02</div>
+            <div class="phase-main">
+              <h3>Diseño</h3>
+              <p>Convierte los requerimientos en una arquitectura: redes, equipos, sistemas, almacenamiento, seguridad y procedimientos.</p>
+            </div>
+            <div class="phase-q"><span>Pregunta guía</span><strong>¿Cómo debe funcionar?</strong></div>
+          </article>
+          <article class="phase">
+            <div class="phase-no">03</div>
+            <div class="phase-main">
+              <h3>Implementación</h3>
+              <p>Instala, configura, integra y pone en operación la solución. Incluye pruebas, documentación y preparación de los usuarios.</p>
+            </div>
+            <div class="phase-q"><span>Pregunta guía</span><strong>¿Cómo se pone en marcha?</strong></div>
+          </article>
+          <article class="phase">
+            <div class="phase-no">04</div>
+            <div class="phase-main">
+              <h3>Evaluación</h3>
+              <p>Mide disponibilidad, desempeño, seguridad, costos e incidentes para detectar mejoras y orientar nuevas decisiones.</p>
+            </div>
+            <div class="phase-q"><span>Pregunta guía</span><strong>¿Está cumpliendo?</strong></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="infra">
+    <div class="container section-grid">
+      <aside class="section-rail">
+        <div class="num">03 / 06</div>
+        <div class="vertical">Infraestructura TIC</div>
+      </aside>
+      <div class="section-body">
+        <div class="section-head fade">
+          <h2>LA BASE<br>DEL SISTEMA</h2>
+          <p>
+            La infraestructura TIC reúne los componentes físicos y digitales que permiten operar,
+            comunicarse, almacenar información y prestar servicios tecnológicos.
+          </p>
+        </div>
+
+        <div class="architecture fade">
+          <div class="arch-visual">
+            <div class="kicker" style="color:var(--acid)">Arquitectura operativa</div>
+            <div class="arch-title">UN SISTEMA,<br>NO PIEZAS SUELTAS.</div>
+            <div class="arch-copy">
+              Equipos, aplicaciones, redes, datos y personas deben integrarse como un solo entorno.
+              La gestión busca continuidad, visibilidad, rendimiento y capacidad de adaptación.
+            </div>
+            <div class="layers">
+              <div class="layer"><span>Personas + procesos</span><span>Gestión</span></div>
+              <div class="layer"><span>Aplicaciones + datos</span><span>Software</span></div>
+              <div class="layer"><span>Redes + conectividad</span><span>Comunicación</span></div>
+              <div class="layer"><span>Equipos + servidores</span><span>Hardware</span></div>
+            </div>
+          </div>
+
+          <div class="topic-grid">
+            <article class="topic">
+              <div class="topic-no">A / 01</div>
+              <h3>Gestión de hardware y software</h3>
+              <p>Controla inventario, licencias, mantenimiento, actualizaciones, compatibilidad y ciclo de vida de los activos tecnológicos.</p>
+            </article>
+            <article class="topic">
+              <div class="topic-no">A / 02</div>
+              <h3>Monitoreo y optimización</h3>
+              <p>Supervisa disponibilidad, consumo y rendimiento para anticipar fallas y utilizar mejor la capacidad existente.</p>
+            </article>
+            <article class="topic">
+              <div class="topic-no">A / 03</div>
+              <h3>Seguridad tecnológica</h3>
+              <p>Protege sistemas, datos y servicios mediante controles, respaldos, actualización, gestión de accesos y respuesta a incidentes.</p>
+            </article>
+            <article class="topic">
+              <div class="topic-no">A / 04</div>
+              <h3>Capacitación continua</h3>
+              <p>Prepara a las personas para usar nuevas herramientas, reducir errores y participar activamente en la seguridad.</p>
+            </article>
+            <article class="topic">
+              <div class="topic-no">A / 05</div>
+              <h3>Integración tecnológica</h3>
+              <p>Busca que plataformas, aplicaciones, procesos y datos trabajen juntos sin crear islas tecnológicas innecesarias.</p>
+            </article>
+            <article class="topic">
+              <div class="topic-no">A / 06</div>
+              <h3>Ética y uso responsable</h3>
+              <p>Incorpora privacidad, transparencia, seguridad, impacto humano y responsabilidad en las decisiones tecnológicas.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="seguridad">
+    <div class="container section-grid">
+      <aside class="section-rail">
+        <div class="num">04 / 06</div>
+        <div class="vertical">Seguridad y personas</div>
+      </aside>
+      <div class="section-body">
+        <div class="section-head fade">
+          <h2>PROTEGER<br>Y APRENDER</h2>
+          <p>
+            La seguridad tecnológica y la capacitación continua funcionan juntas. Una infraestructura
+            puede ser avanzada, pero si las personas no conocen buenas prácticas, el riesgo permanece.
+          </p>
+        </div>
+
+        <div class="security-board fade">
+          <div class="cyber">
+            <div class="cyber-head">
+              <h3>Riesgo<br>digital</h3>
+              <div class="badge">NIST CSF 2.0 / referencia</div>
+            </div>
+            <div class="cyber-flow">
+              <div class="cyber-row"><i></i><strong>Gobernar</strong><span>Definir responsabilidades y estrategia.</span></div>
+              <div class="cyber-row"><i></i><strong>Identificar</strong><span>Conocer activos, amenazas y riesgos.</span></div>
+              <div class="cyber-row"><i></i><strong>Proteger</strong><span>Aplicar controles preventivos.</span></div>
+              <div class="cyber-row"><i></i><strong>Detectar</strong><span>Reconocer eventos anómalos.</span></div>
+              <div class="cyber-row"><i></i><strong>Responder</strong><span>Actuar frente a incidentes.</span></div>
+              <div class="cyber-row"><i></i><strong>Recuperar</strong><span>Restablecer operaciones y aprender.</span></div>
+            </div>
+          </div>
+
+          <div class="training">
+            <div>
+              <div class="mega">↑</div>
+              <h3>Capacitación continua</h3>
+              <p>
+                Mantiene actualizadas las competencias digitales y facilita la adopción de nuevas
+                tecnologías dentro de la organización.
+              </p>
+            </div>
+            <div class="checks">
+              <div class="check"><b>01</b><span>Inducción al introducir nuevas plataformas.</span></div>
+              <div class="check"><b>02</b><span>Buenas prácticas de seguridad y manejo de datos.</span></div>
+              <div class="check"><b>03</b><span>Actualización periódica de competencias.</span></div>
+              <div class="check"><b>04</b><span>Documentación y aprendizaje accesible.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="etica">
+    <div class="container section-grid">
+      <aside class="section-rail">
+        <div class="num">05 / 06</div>
+        <div class="vertical">Ética tecnológica</div>
+      </aside>
+      <div class="section-body">
+        <div class="ethics fade">
+          <div class="ethics-left">
+            <div class="kicker">Uso responsable</div>
+            <h3>EL CRITERIO<br>TAMBIÉN ES<br>TECNOLOGÍA.</h3>
+            <p>
+              Una decisión tecnológica no debe evaluarse solo por velocidad o costo. También debe
+              considerar cómo afecta la privacidad, la seguridad, las personas y la organización.
+            </p>
+          </div>
+          <div class="principles">
+            <div class="principle"><small>P / 01</small><strong>Privacidad y protección de datos</strong></div>
+            <div class="principle"><small>P / 02</small><strong>Transparencia</strong></div>
+            <div class="principle"><small>P / 03</small><strong>Equidad y no discriminación</strong></div>
+            <div class="principle"><small>P / 04</small><strong>Supervisión humana</strong></div>
+            <div class="principle"><small>P / 05</small><strong>Seguridad y prevención de daños</strong></div>
+            <div class="principle"><small>P / 06</small><strong>Responsabilidad y sostenibilidad</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="conclusion" id="cierre">
+    <div class="container conclusion-grid fade">
+      <div class="left">06 / 06<br>Conclusión</div>
+      <div>
+        <h2>LA TECNOLOGÍA GENERA VALOR CUANDO EXISTE DIRECCIÓN.</h2>
+        <p>
+          La gerencia de recursos TIC integra planificación, diseño, implementación y evaluación para
+          convertir la infraestructura tecnológica en una capacidad útil para la empresa. Administrar
+          hardware y software, monitorear recursos, proteger información, capacitar personas, integrar
+          soluciones y actuar con ética permite construir un entorno más eficiente, seguro y adaptable.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="references" id="fuentes">
+    <div class="container">
+      <div class="kicker fade">Fuentes consultadas</div>
+      <h2 class="fade">REFERENCIAS<br>TÉCNICAS</h2>
+      <div class="ref-list fade">
+        <a class="ref" href="https://www.nist.gov/publications/nist-cybersecurity-framework-csf-20" target="_blank" rel="noopener">
+          <div class="rno">01</div><strong>NIST — Cybersecurity Framework 2.0</strong><span>Gestión del riesgo de ciberseguridad</span><div class="go">↗</div>
+        </a>
+        <a class="ref" href="https://csrc.nist.gov/pubs/sp/1800/5/final" target="_blank" rel="noopener">
+          <div class="rno">02</div><strong>NIST — IT Asset Management</strong><span>Gestión y visibilidad de activos TI</span><div class="go">↗</div>
+        </a>
+        <a class="ref" href="https://www.ibm.com/think/topics/it-infrastructure" target="_blank" rel="noopener">
+          <div class="rno">03</div><strong>IBM — IT Infrastructure</strong><span>Conceptos de infraestructura tecnológica</span><div class="go">↗</div>
+        </a>
+        <a class="ref" href="https://www.oecd.org/en/topics/digital-security-risk-management.html" target="_blank" rel="noopener">
+          <div class="rno">04</div><strong>OECD — Digital Security Risk Management</strong><span>Gestión del riesgo digital</span><div class="go">↗</div>
+        </a>
+        <a class="ref" href="https://www.unesco.org/en/artificial-intelligence/recommendation-ethics" target="_blank" rel="noopener">
+          <div class="rno">05</div><strong>UNESCO — Recommendation on the Ethics of AI</strong><span>Principios de uso responsable</span><div class="go">↗</div>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div></div>
+    <div class="footer-code">GRTIC / 2026 / PTY</div>
+  </div>
+</footer>
+
+<script>
+const progress = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = (window.scrollY / h * 100) + '%';
+});
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.12});
+document.querySelectorAll('.fade').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
